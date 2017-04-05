@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Rename resource &apos;Experiment3_Ex1/customLibs/tiva_utils.h&apos; to &apos;tivaUtils.h&apos;" description="Rename resource &apos;tiva_utils.h&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="customLibs/tiva_utils.h" name="tivaUtils.h" stamp="1488908749415" updateReferences="true"/>&#x0A;<refactoring comment="Rename resource &apos;Experiment3_Ex1/text&apos; to &apos;text.c&apos;" description="Rename resource &apos;text&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="text" name="text.c" stamp="1488911981819" updateReferences="true"/>
+</session>

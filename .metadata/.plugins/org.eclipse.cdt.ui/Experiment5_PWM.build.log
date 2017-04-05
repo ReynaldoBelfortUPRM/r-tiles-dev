@@ -1,0 +1,43 @@
+
+**** Build of configuration Debug for project Experiment5_PWM ****
+
+"C:\\ti\\ccsv6\\utils\\bin\\gmake" -k all 
+'\\fs.ece.uprm.edu\students\s402120683\Desktop\Micro 2 files\micro2-repository-workspace\micro2-lab-experiments\Experiment5_PWM\Debug'
+CMD.EXE was started with the above path as the current directory.
+UNC paths are not supported.  Defaulting to Windows directory.
+'Building file: ../main.c'
+'\\fs.ece.uprm.edu\students\s402120683\Desktop\Micro 2 files\micro2-repository-workspace\micro2-lab-experiments\Experiment5_PWM\Debug'
+CMD.EXE was started with the above path as the current directory.
+UNC paths are not supported.  Defaulting to Windows directory.
+'Invoking: ARM Compiler'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" -g --gcc --define=ccs="ccs" --define=TARGET_IS_BLIZZARD_RB1 --define=PART_TM4C123GH6PM --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="main.pp"  "../main.c"
+'\\fs.ece.uprm.edu\students\s402120683\Desktop\Micro 2 files\micro2-repository-workspace\micro2-lab-experiments\Experiment5_PWM\Debug'
+CMD.EXE was started with the above path as the current directory.
+UNC paths are not supported.  Defaulting to Windows directory.
+Fatal error #1965: cannot open source file "../main.c"
+1 catastrophic error detected in the compilation of "../main.c".
+Compilation terminated.
+
+>> Compilation failure
+gmake: *** [main.obj] Error 1
+'\\fs.ece.uprm.edu\students\s402120683\Desktop\Micro 2 files\micro2-repository-workspace\micro2-lab-experiments\Experiment5_PWM\Debug'
+CMD.EXE was started with the above path as the current directory.
+UNC paths are not supported.  Defaulting to Windows directory.
+'Building file: ../tm4c123gh6pm_startup_ccs.c'
+'\\fs.ece.uprm.edu\students\s402120683\Desktop\Micro 2 files\micro2-repository-workspace\micro2-lab-experiments\Experiment5_PWM\Debug'
+CMD.EXE was started with the above path as the current directory.
+UNC paths are not supported.  Defaulting to Windows directory.
+'Invoking: ARM Compiler'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me --include_path="C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --include_path="C:/ti/TivaWare_C_Series-2.1.4.178" -g --gcc --define=ccs="ccs" --define=TARGET_IS_BLIZZARD_RB1 --define=PART_TM4C123GH6PM --display_error_number --diag_warning=225 --diag_wrap=off --preproc_with_compile --preproc_dependency="tm4c123gh6pm_startup_ccs.pp"  "../tm4c123gh6pm_startup_ccs.c"
+'\\fs.ece.uprm.edu\students\s402120683\Desktop\Micro 2 files\micro2-repository-workspace\micro2-lab-experiments\Experiment5_PWM\Debug'
+CMD.EXE was started with the above path as the current directory.
+UNC paths are not supported.  Defaulting to Windows directory.
+Fatal error #1965: cannot open source file "../tm4c123gh6pm_startup_ccs.c"
+1 catastrophic error detected in the compilation of "../tm4c123gh6pm_startup_ccs.c".
+Compilation terminated.
+
+>> Compilation failure
+gmake: *** [tm4c123gh6pm_startup_ccs.obj] Error 1
+gmake: Target `all' not remade because of errors.
+
+**** Build Finished ****

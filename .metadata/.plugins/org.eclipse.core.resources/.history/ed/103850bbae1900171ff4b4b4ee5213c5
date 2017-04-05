@@ -1,0 +1,34 @@
+#include <stdint.h>
+#include <stdbool.h>
+#include "inc/tm4c123gh6pm.h"
+#include "inc/hw_types.h"
+#include "inc/hw_memmap.h"
+#include "driverlib/sysctl.h"
+#include "driverlib/gpio.h"
+#include "driverlib/debug.h"
+#include "driverlib/pwm.h"
+#include "driverlib/pin_map.h"
+#include "inc/hw_gpio.h"
+
+//Custom libraries
+#include "tivaUtils.h"
+
+int main (void){
+
+    //----MCU Initialization----
+    SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_XTAL_16MHZ|SYSCTL_OSC_MAIN); //Set-up the clocking of the MCU to 40MHz
+    //Enable port E peripheral
+    SysCtlPeripheralEnable(GPIO_PORTE_BASE);
+
+    GPIOPinTypeGPIOOutput(GPIO_PORTE_BASE, GPIO_PIN_1); //STEP pin of the driver
+    //--------------------------
+
+	while(1){
+
+		//Perform a step
+		GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_1, 2); //Set pin HIGH
+		setDelay(1); //1ms delay
+		GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_1, 0); //Set pin LOW
+
+	}
+}
