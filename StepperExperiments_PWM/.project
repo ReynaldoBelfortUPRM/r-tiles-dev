@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>StepperExperiments_PWM</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.cdt.managedbuilder.core.ScannerConfigBuilder</name>
+			<triggers>full,incremental,</triggers>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>com.ti.ccstudio.core.ccsNature</nature>
+		<nature>org.eclipse.cdt.core.cnature</nature>
+		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
+		<nature>org.eclipse.cdt.core.ccnature</nature>
+		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>driverlib.lib</name>
+			<type>1</type>
+			<locationURI>TIVAWARE_INSTALL/driverlib/ccs/Debug/driverlib.lib</locationURI>
+		</link>
+		<link>
+			<name>libraries/MIL_LCD_lib.c</name>
+			<type>1</type>
+			<location>//fs.ece.uprm.edu/students/s402120683/My Documents/Micro 2 files/micro2-repository-workspace/r-tiles-dev/custom-libraries/MIL_LCD_lib.c</location>
+		</link>
+		<link>
+			<name>libraries/MIL_LCD_lib.h</name>
+			<type>1</type>
+			<location>//fs.ece.uprm.edu/students/s402120683/My Documents/Micro 2 files/micro2-repository-workspace/r-tiles-dev/custom-libraries/MIL_LCD_lib.h</location>
+		</link>
+		<link>
+			<name>libraries/tivaUtils.c</name>
+			<type>1</type>
+			<location>//fs.ece.uprm.edu/students/s402120683/My Documents/Micro 2 files/micro2-repository-workspace/r-tiles-dev/custom-libraries/tivaUtils.c</location>
+		</link>
+		<link>
+			<name>libraries/tivaUtils.h</name>
+			<type>1</type>
+			<location>//fs.ece.uprm.edu/students/s402120683/My Documents/Micro 2 files/micro2-repository-workspace/r-tiles-dev/custom-libraries/tivaUtils.h</location>
+		</link>
+	</linkedResources>
+	<variableList>
+		<variable>
+			<name>LIBRARIES_GIT_FOLDER</name>
+			<value>file:/X:/Desktop/Micro%202%20files/micro2-repository-workspace</value>
+		</variable>
+		<variable>
+			<name>TIVAWARE_INSTALL</name>
+			<value>file:/C:/ti/TivaWare_C_Series-2.1.4.178</value>
+		</variable>
+	</variableList>
+</projectDescription>

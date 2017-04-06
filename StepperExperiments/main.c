@@ -14,7 +14,8 @@
 #include "tivaUtils.h"
 
 //Constants
-#define PULSE_DELAY 5
+#define PULSE_DELAY 1
+#define PULSE_DELAY_MICROSEC 500 //microseconds 4%-4.8% error This number is not necesarily accurate.
 
 //Function declarations
 void PUSH_ISR();
@@ -33,7 +34,7 @@ int main (void){
     //setDelay(2); //1ms delay
    // while( !(SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOE)) ); //In order to avoid potential FaultISR
 
-    GPIOPinTypeGPIOOutput(GPIO_PORTE_BASE, GPIO_PIN_1); //Driver's STEP pin
+    GPIOPinTypeGPIOOutput(GPIO_PORTE_BASE, GPIO_PIN_1 | GPIO_PIN_2); //Driver's STEP pin
     //--------------------------
 
     //---------Set up Port F push button---------
@@ -54,35 +55,35 @@ int main (void){
 
 	while(1){
 
-//		if(pushFlag){
-//			pushFlag = false;
-//			//Change direction according to the button pushed
-//			if(pushButton == 8){ //SW1 button
-//				GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_2, 4);
-//			}
-//			else{ //SW2 button
-//				GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_2, 0);
-//			}
-//		}
+		if(pushFlag){
+			pushFlag = false;
+			//Change direction according to the button pushed
+			if(pushButton == 16){ //SW1 button
+				GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_2, 4); //Set DIR pin HIGH
+				setDelay(1);
+			}
+			else{ //SW2 button
+				GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_2, 0); //Set STEP pin LOW
+				setDelay(1);
+			}
+		}
 
 		//****Important! Take into consideration the DRV8825 Timing Diagram!****
 
-		//Perform a step
-		if(pushFlag) { GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_2, 4); setDelay(1); } //Set DIR pin HIGH
-		GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_1, 2); //Set pin HIGH
-		if(pushFlag) { GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_2, 0); setDelay(1); } //Set DIR pin LOW
-		setDelay(PULSE_DELAY); //ms delay
-		GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_1, 0); //Set pin LOW
-		setDelay(PULSE_DELAY); //ms delay
+		GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_1, 2); //Set STEP pin HIGH
+//		setDelay(PULSE_DELAY); //ms delay
+		setDelayMicro(PULSE_DELAY_MICROSEC); //us delay
 
-		if(pushFlag) { pushFlag = false; }
+		GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_1, 0); //Set STEP pin LOW
+//		setDelay(PULSE_DELAY); //ms delay
+		setDelayMicro(PULSE_DELAY_MICROSEC); //us delay
+
 	}
 }
 
-
 void PUSH_ISR(){
 	setDelay(30); //For debouncing
-	//pushFlag = true;
-	//pushButton = GPIOIntStatus(GPIO_PORTF_BASE,true); //To read which button interrupted
+	pushFlag = true;
+	pushButton = GPIOIntStatus(GPIO_PORTF_BASE,true); //To read which button interrupted
 	GPIOIntClear(GPIO_PORTF_BASE, GPIO_PIN_4|GPIO_PIN_0);
 }
