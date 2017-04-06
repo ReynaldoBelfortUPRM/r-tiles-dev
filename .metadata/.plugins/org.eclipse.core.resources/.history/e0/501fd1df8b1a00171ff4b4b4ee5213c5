@@ -1,0 +1,30 @@
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
+# Add inputs and outputs from these tool invocations to the build variables 
+C_SRCS += \
+//fs.ece.uprm.edu/students/s402120683/My\ Documents/Micro\ 2\ files/micro2-repository-workspace/r-tiles-dev/custom-libraries/MIL_LCD_lib.c \
+//fs.ece.uprm.edu/students/s402120683/My\ Documents/Micro\ 2\ files/micro2-repository-workspace/r-tiles-dev/custom-libraries/tivaUtils.c 
+
+OBJS += \
+./libraries/MIL_LCD_lib.obj \
+./libraries/tivaUtils.obj 
+
+C_DEPS += \
+./libraries/MIL_LCD_lib.pp \
+./libraries/tivaUtils.pp 
+
+C_DEPS__QUOTED += \
+"libraries\MIL_LCD_lib.pp" \
+"libraries\tivaUtils.pp" 
+
+OBJS__QUOTED += \
+"libraries\MIL_LCD_lib.obj" \
+"libraries\tivaUtils.obj" 
+
+C_SRCS__QUOTED += \
+"//fs.ece.uprm.edu/students/s402120683/My Documents/Micro 2 files/micro2-repository-workspace/r-tiles-dev/custom-libraries/MIL_LCD_lib.c" \
+"//fs.ece.uprm.edu/students/s402120683/My Documents/Micro 2 files/micro2-repository-workspace/r-tiles-dev/custom-libraries/tivaUtils.c" 
+
+

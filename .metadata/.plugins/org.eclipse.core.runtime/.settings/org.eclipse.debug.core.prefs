@@ -5,4 +5,4 @@
 TerminalPrefInvertColors=true
 eclipse.preferences.version=1
 overriddenByCSS=,TerminalPrefInvertColors,
-prefWatchExpressions=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\r\n<watchExpressions>\r\n<expression enabled\="true" text\="pushFlag"/>\r\n<expression enabled\="true" text\="pushButton"/>\r\n<expression enabled\="true" text\="(pushButton \=\= 16)"/>\r\n<expression enabled\="true" text\="pushFlag &amp;&amp; (pushButton \=\= 16)"/>\r\n<expression enabled\="true" text\="pushFlag"/>\r\n</watchExpressions>\r\n
+prefWatchExpressions=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\r\n<watchExpressions>\r\n<expression enabled\="true" text\="currentSpeed"/>\r\n<expression enabled\="true" text\="pwmLoadValue"/>\r\n<expression enabled\="true" text\="pwmClockFreq"/>\r\n<expression enabled\="true" text\="pushFlag"/>\r\n</watchExpressions>\r\n

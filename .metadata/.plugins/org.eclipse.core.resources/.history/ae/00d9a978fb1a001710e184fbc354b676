@@ -1,0 +1,32 @@
+/*****************************************************************************
+ *	 		Stepper Motor Library for the DRV8825 Stepper driver
+ *	IMPLEMENTATION file: stepperSWDriver.c - function implementations
+ *
+ *  TODO Insert description here
+ *
+ *  Developed by Reynaldo Belfort
+ *  R-Tiles Team:
+ *  Emmanuel Ramos
+ *  Reynaldo Belfort
+ *  Carlos Rodriguez
+ *  Osvaldo Ramirez
+ *
+ * ----------------------Notes----------------------
+ *
+*****************************************************************************/
+
+#include "stepperSWDriver.h"
+
+//Send a pulse to the STEP pin
+void performStep(bool direction){
+
+	GPIOPinWrite(DRIVER_PORT, DRIVER_STEP_PIN, 2); //Set STEP pin HIGH
+	setDelayMicro(PULSE_DELAY_MICROSEC); //us delay to comply with DRV8825 timing diagram
+	GPIOPinWrite(DRIVER_PORT, DRIVER_STEP_PIN, 0); //Set STEP pin LOW
+	setDelayMicro(PULSE_DELAY_MICROSEC);//us delay to comply with DRV8825 timing diagram
+
+}
+
+void performAmountSteps(uint32_t amountSteps, bool direction){
+
+}

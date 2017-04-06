@@ -9,7 +9,7 @@
 ' '
 'Building target: StepperExperiments.out'
 'Invoking: ARM Linker'
-"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --display_error_number --diag_warning=225 --diag_wrap=off -z -m"StepperExperiments.map" --heap_size=0 --stack_size=800 -i"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/lib" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="StepperExperiments_linkInfo.xml" --rom_model -o "StepperExperiments.out" "./main.obj" "./tm4c123gh6pm_startup_ccs.obj" "./libraries/MIL_LCD_lib.obj" "./libraries/tivaUtils.obj" "C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/ccs/Debug/driverlib.lib" "../tm4c123gh6pm.cmd"  -l"libc.a" 
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me -g --gcc --define=ccs="ccs" --define=PART_TM4C123GH6PM --display_error_number --diag_warning=225 --diag_wrap=off -z -m"StepperExperiments.map" --heap_size=0 --stack_size=800 -i"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/lib" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.2/include" --reread_libs --warn_sections --display_error_number --diag_wrap=off --xml_link_info="StepperExperiments_linkInfo.xml" --rom_model -o "StepperExperiments.out" "./main.obj" "./tm4c123gh6pm_startup_ccs.obj" "./libraries/MIL_LCD_lib.obj" "./libraries/stepperSWDriver.obj" "./libraries/tivaUtils.obj" "C:/ti/TivaWare_C_Series-2.1.4.178/driverlib/ccs/Debug/driverlib.lib" "../tm4c123gh6pm.cmd"  -l"libc.a" 
 <Linking>
 'Finished building target: StepperExperiments.out'
 ' '

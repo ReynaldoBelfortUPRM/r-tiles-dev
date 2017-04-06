@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
+	<section name="CCE.ImportMacrosWizard">
+		<item value="\\fs.ece.uprm.edu\students\s402120683\My Documents\Micro 2 files\micro2-repository-workspace\r-tiles-dev\vars.ini" key="MacrosFileSelectionPage.BROWSE_FILTER"/>
+	</section>
 	<section name="com.ti.ccstudio.project.ui.internal.properties.DynamicPropertiesPageManager">
 	</section>
 	<section name="com.ti.ccstudio.project.ui.internal.preferences.DynamicPreferencePageManager">
@@ -13,11 +16,11 @@
 		<item value="C:\ti\ccsv6\ccs_base\common\targetdb\devices\tm4c123gh6pm.xml" key="CCS.TARGET"/>
 		<item value="C:\ti\ccsv6\ccs_base\common\targetdb\connections\Stellaris_ICDI_Connection.xml" key="CCS.CONNECTION"/>
 		<section name="1">
-			<item value="" key="CCS.DEVICE_ENDIANNESS"/>
 			<item value="" key="CCS.CODEGEN_TOOL_VERSION"/>
+			<item value="" key="CCS.DEVICE_ENDIANNESS"/>
 			<item value="null" key="CCS.LINKER_COMMAND_FILE"/>
-			<item value="null" key="CCS.RUNTIME_SUPPORT_LIB"/>
 			<item value="executable" key="CCS.OUTPUT_TYPE"/>
+			<item value="null" key="CCS.RUNTIME_SUPPORT_LIB"/>
 			<item value="" key="CCS.OUTPUT_FORMAT"/>
 		</section>
 	</section>

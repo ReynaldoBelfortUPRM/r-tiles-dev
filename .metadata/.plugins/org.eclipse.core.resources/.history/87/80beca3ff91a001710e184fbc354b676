@@ -1,0 +1,20 @@
+/*****************************************************************************
+ *	 		Stepper Motor Software for DRV8825 Stepper driver
+ *	File: stepperSWDriver.h - function prototype and constant definitions
+ *
+ *  This library contains common routines for interfacing with the
+ *  LCD Module Controller: 932-MIKROE-55 from the MIL lab
+ *
+ *  Developed by Reynaldo Belfort
+ *  Lab Team:
+ *  Emmanuel Ramos
+ *  Reynaldo Belfort
+ *
+ * ----------------------Notes----------------------
+ * This library assumes the following pin configuration (7-0 bits) on the TIVA MCU
+ * 7  6  5  4  3  2  1  0
+ * D7,D6,D5,D4,D3,D2,D1,D0 - port B GPIOs - Data Port
+ * RS,R/W,E 		       - port A GPIOs - Control Port
+ *
+*****************************************************************************/
+
