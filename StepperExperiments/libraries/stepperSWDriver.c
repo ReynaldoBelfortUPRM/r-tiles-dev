@@ -53,9 +53,9 @@
 #include "tivaUtils.h"
 
 //Send a pulse to the STEP pin
-void performStep(bool direction){
+void performStep(bool clockwise){ //TODO Verify if in effect, true represents clockwise for the parameter
 
-	if(direction == true){
+	if(clockwise == true){ //Clockwise direction
 		GPIOPinWrite(DRIVER_PORT, DRIVER_DIR_PIN, 4); //Set DIR pin HIGH
 		setDelayMicro(500);
 	}
@@ -73,6 +73,50 @@ void performStep(bool direction){
 
 }
 
-void performAmountSteps(uint32_t amountSteps, bool direction){
+void performAmountSteps(uint32_t amountSteps, bool clockwise){
+	int counter = 0;
+	for(; counter < amountSteps; counter++){
+		performStep(clockwise); //just in a single direction
+	}
+}
+
+//distance in meters
+void spinStepperMeters(double distance, bool clockwise){
+
+	uint32_t amountSteps = 0;
+	amountSteps = (MOTOR_WHEEL_CIRCUM_METERS / distance) * MOTOR_STEPS_PER_REV;
+	uint32_t counter = 0;
+	for(; counter < amountSteps; counter++){
+		performStep(clockwise); //just in a single direction
+	}
 
 }
+
+//distance in inches
+void spinStepperInches(double distance, bool clockwise){
+
+	uint32_t amountSteps = 0;
+	amountSteps = (MOTOR_WHEEL_CIRCUM_INCHES / distance) * MOTOR_STEPS_PER_REV;
+	uint32_t counter = 0;
+	for(; counter < amountSteps; counter++){
+		performStep(clockwise); //just in a single direction
+	}
+
+}
+
+//angle in degrees
+void spinStepperAngle(float angle, bool clockwise){
+
+	uint32_t amountSteps = 0;
+	uint32_t stepCounter = 0;
+	//Perform angle -> # step conversion
+	amountSteps = angle / MOTOR_STEP_ANGLE;
+
+	//We perform a correction multiplying by 4 because we take into consideration that 32steps equals to a 90 degree rotation
+	for(;stepCounter < amountSteps ; stepCounter++){
+		performStep(clockwise);
+	}
+
+}
+
+

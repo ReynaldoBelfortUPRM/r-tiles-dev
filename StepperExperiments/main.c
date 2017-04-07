@@ -55,6 +55,13 @@ int main (void){
 
 	while(1){
 
+		//-----------------DISTANCE SPINNING PROGRAM----------------------
+//		if(pushFlag){
+//			pushFlag = false;
+//			spinStepperInches(13.35176878, true);
+//			setDelay(10); //ms
+//		}
+
 //		if(pushFlag){
 //			pushFlag = false;
 //			//Change direction according to the button pushed
@@ -67,9 +74,9 @@ int main (void){
 //				setDelay(1);
 //			}
 //		}
-//
-//		//****Important! Take into consideration the DRV8825 Timing Diagram!****
-//
+
+		//****Important! Take into consideration the DRV8825 Timing Diagram!****
+
 //		GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_1, 2); //Set STEP pin HIGH
 ////		setDelay(PULSE_DELAY); //ms delay
 //		setDelayMicro(PULSE_DELAY_MICROSEC); //us delay
@@ -78,18 +85,41 @@ int main (void){
 ////		setDelay(PULSE_DELAY); //ms delay
 //		setDelayMicro(PULSE_DELAY_MICROSEC); //us delay
 
-
 		//------------TEST: performStep(direction) function test
 
-		if(!stopFlag){
-			//Perform many steps
-			int counter = 0;
-			for(; counter < 20; counter++){
-				performStep(false); //just in a single direction
-				setDelay(100); //in ms
+//		if(!stopFlag){
+//			//Perform many steps
+//			int counter = 0;
+//			for(; counter < 20; counter++){
+//				performStep(false); //just in a single direction
+//				setDelay(100); //in ms
+//			}
+//			stopFlag = true;
+//		}
+
+
+	//-----------------ROTATE BY PUSH BUTTON PROGRAM----------------------
+		//Left and right push buttons are used to turn motor clockWise or coutnerClockwise respectively
+		if(pushFlag){
+			pushFlag = false;
+			//Change direction according to the button pushed
+			if(pushButton == 16){ //SW1 button
+				int counter = 0;
+				for(; counter < 200; counter++){
+					performStep(false); //just in a single direction
+					setDelay(1); //in ms
+				}
 			}
-			stopFlag = true;
+			else{ //SW2 button
+				int counter = 0;
+				for(; counter < 200; counter++){
+					performStep(true); //just in a single direction
+					setDelay(1); //in ms
+				}
+			}
 		}
+
+
 	} //End while
 }
 
