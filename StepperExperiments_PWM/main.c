@@ -1,3 +1,13 @@
+/*
+ * main.c
+ * Experimenting with PWM and the DRV8825 driver
+ *
+ * Station 13
+ * Lab Team:
+ * Emmanuel Ramos
+ * Reynaldo Belfort
+ */
+
 #include <stdint.h>
 #include <stdbool.h>
 #include "inc/tm4c123gh6pm.h"
@@ -27,7 +37,7 @@ void PUSH_ISR();
 //Global Variables
 uint8_t pushButton = 0;
 bool pushFlag = false;
-volatile int currentSpeed = 80; //Initialized to start speed (20 herz is the minimum)
+volatile int currentSpeed = 80; //Initialized to start speed (units: steps/sec or Hz) (20 herz is the minimum)
 volatile uint32_t pwmLoadValue = 0;
 volatile uint32_t pwmClockFreq = 0;
 

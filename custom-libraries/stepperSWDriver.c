@@ -55,6 +55,7 @@
 //Send a pulse to the STEP pin
 void performStep(bool clockwise){ //TODO Verify if in effect, true represents clockwise for the parameter
 
+	//TODO Having thess if-clauses may cause problems. We constantly keep setting the DIR pin
 	if(clockwise == true){ //Clockwise direction
 		GPIOPinWrite(DRIVER_PORT, DRIVER_DIR_PIN, 4); //Set DIR pin HIGH
 		setDelayMicro(500);

@@ -31,30 +31,30 @@
 			<locationURI>TIVAWARE_INSTALL/driverlib/ccs/Debug/driverlib.lib</locationURI>
 		</link>
 		<link>
-			<name>libraries/MIL_LCD_lib.c</name>
+			<name>stepperSWDriver.c</name>
 			<type>1</type>
-			<location>//fs.ece.uprm.edu/students/s402120683/My Documents/Micro 2 files/micro2-repository-workspace/r-tiles-dev/custom-libraries/MIL_LCD_lib.c</location>
+			<locationURI>CUSTOM_LIBS/stepperSWDriver.c</locationURI>
 		</link>
 		<link>
-			<name>libraries/MIL_LCD_lib.h</name>
+			<name>stepperSWDriver.h</name>
 			<type>1</type>
-			<location>//fs.ece.uprm.edu/students/s402120683/My Documents/Micro 2 files/micro2-repository-workspace/r-tiles-dev/custom-libraries/MIL_LCD_lib.h</location>
+			<locationURI>CUSTOM_LIBS/stepperSWDriver.h</locationURI>
 		</link>
 		<link>
-			<name>libraries/tivaUtils.c</name>
+			<name>tivaUtils.c</name>
 			<type>1</type>
-			<location>//fs.ece.uprm.edu/students/s402120683/My Documents/Micro 2 files/micro2-repository-workspace/r-tiles-dev/custom-libraries/tivaUtils.c</location>
+			<locationURI>CUSTOM_LIBS/tivaUtils.c</locationURI>
 		</link>
 		<link>
-			<name>libraries/tivaUtils.h</name>
+			<name>tivaUtils.h</name>
 			<type>1</type>
-			<location>//fs.ece.uprm.edu/students/s402120683/My Documents/Micro 2 files/micro2-repository-workspace/r-tiles-dev/custom-libraries/tivaUtils.h</location>
+			<locationURI>CUSTOM_LIBS/tivaUtils.h</locationURI>
 		</link>
 	</linkedResources>
 	<variableList>
 		<variable>
-			<name>LIBRARIES_GIT_FOLDER</name>
-			<value>file:/X:/Desktop/Micro%202%20files/micro2-repository-workspace</value>
+			<name>CUSTOM_LIBS</name>
+			<value>file:/C:/Users/reyna/Documents/Code%20Composer/Micro2%20Lab%20Workspace/r-tiles-dev/custom-libraries</value>
 		</variable>
 		<variable>
 			<name>TIVAWARE_INSTALL</name>

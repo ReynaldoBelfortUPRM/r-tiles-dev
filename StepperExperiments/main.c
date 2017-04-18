@@ -1,3 +1,24 @@
+/*
+ * main.c
+ * TIVA MCU software for experimenting with the DRV8825 stepper motor driver
+ *
+ * Station 13
+ * Lab Team:
+ * Emmanuel Ramos
+ * Reynaldo Belfort
+ */
+
+
+/* MCU Pins
+ * Port E:
+ * 	1 - STEP pin
+ * 	2 - DIR pin
+ * Port F:
+ * 	0 - SW2 Launchpad Pushbutton
+ * 	4 - SW1 Launchpad Pushbutton
+ *
+ * */
+
 #include <stdint.h>
 #include <stdbool.h>
 #include "inc/tm4c123gh6pm.h"
@@ -12,7 +33,7 @@
 
 //Custom libraries
 #include "tivaUtils.h"
-#include "libraries/stepperSWDriver.h"
+#include "stepperSWDriver.h"
 
 //Constants
 #define PULSE_DELAY 1
