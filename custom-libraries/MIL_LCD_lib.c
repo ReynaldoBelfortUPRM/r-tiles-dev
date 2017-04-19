@@ -1,6 +1,6 @@
 /*****************************************************************************
  *	 		LCD Controller library for Module: 932-MIKROE-55
- *	File: MIL_LCD_lib.h - function prototype and constant definitions
+ *	File: MIL_LCD_lib.c - function implementations
  *
  *  This library contains common routines for interfacing with the
  *  LCD Module Controller: 932-MIKROE-55 from the MIL lab

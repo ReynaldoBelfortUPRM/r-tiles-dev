@@ -13,16 +13,16 @@
 		<item value="false" key="isRegEx"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="index" key="selection"/>
+		<item value="SysCtlPWMClockSet" key="selection"/>
 		<list key="findhistory">
+			<item value="SysCtlPWMClockSet"/>
+			<item value="lock"/>
 			<item value="index"/>
 			<item value="SOFTWARE"/>
 			<item value="\"/>
 			<item value="countUpdated"/>
 			<item value="counterUpdated"/>
 			<item value="CLOCK_FREQ\"/>
-			<item value="CLOCK_FREQ"/>
-			<item value="SysCtlDelay"/>
 		</list>
 		<list key="replacehistory">
 		</list>

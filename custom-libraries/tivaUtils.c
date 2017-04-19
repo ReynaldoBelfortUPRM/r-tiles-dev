@@ -26,7 +26,7 @@ void setDelay(uint32_t waitTime){
 	SysCtlDelay(computeDelayCount(waitTime, CLOCK_FREQ));
 }
 
-//waitTime - time to delay in milliseconds
-void setDelayMicro(float waitTime){
-	SysCtlDelay(computeDelayCountMicrosec(waitTime*0.001, CLOCK_FREQ));
+//waitTime - time to delay in microsecods
+void setDelayMicro(float microSecWaitTime){
+	SysCtlDelay(computeDelayCountMicrosec(microSecWaitTime*0.001, CLOCK_FREQ));
 }

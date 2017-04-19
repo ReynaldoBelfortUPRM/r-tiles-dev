@@ -1,3 +1,24 @@
+/*
+ * main.c
+ * TIVA MCU software for experimenting with the DRV8825 stepper motor driver
+ *
+ * Station 13
+ * Lab Team:
+ * Emmanuel Ramos
+ * Reynaldo Belfort
+ */
+
+
+/* MCU Pin conecction information:
+ * Port E:
+ * 	1 - STEP pin
+ * 	2 - DIR pin
+ * Port F:
+ * 	0 - SW2 Launchpad Pushbutton
+ * 	4 - SW1 Launchpad Pushbutton
+ *
+ * */
+
 #include <stdint.h>
 #include <stdbool.h>
 #include "inc/tm4c123gh6pm.h"
@@ -12,6 +33,7 @@
 
 //Custom libraries
 #include "tivaUtils.h"
+#include "stepperSWDriver.h"
 
 //Constants
 #define PULSE_DELAY 1
@@ -23,6 +45,7 @@ void PUSH_ISR();
 //Global Variables
 uint8_t pushButton = 0;
 bool pushFlag = false;
+bool stopFlag = false;
 
 int main (void){
     //----MCU Initialization----
@@ -51,34 +74,74 @@ int main (void){
     GPIOIntEnable(GPIO_PORTF_BASE, GPIO_PIN_4|GPIO_PIN_0);
     //--------------------------------
 
-    pushFlag = true;
-
 	while(1){
 
+		//-----------------DISTANCE SPINNING PROGRAM----------------------
+//		if(pushFlag){
+//			pushFlag = false;
+//			spinStepperInches(13.35176878, true);
+//			setDelay(10); //ms
+//		}
+
+//		if(pushFlag){
+//			pushFlag = false;
+//			//Change direction according to the button pushed
+//			if(pushButton == 16){ //SW1 button
+//				GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_2, 4); //Set DIR pin HIGH
+//				setDelay(1);
+//			}
+//			else{ //SW2 button
+//				GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_2, 0); //Set STEP pin LOW
+//				setDelay(1);
+//			}
+//		}
+
+		//****Important! Take into consideration the DRV8825 Timing Diagram!****
+
+//		GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_1, 2); //Set STEP pin HIGH
+////		setDelay(PULSE_DELAY); //ms delay
+//		setDelayMicro(PULSE_DELAY_MICROSEC); //us delay
+//
+//		GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_1, 0); //Set STEP pin LOW
+////		setDelay(PULSE_DELAY); //ms delay
+//		setDelayMicro(PULSE_DELAY_MICROSEC); //us delay
+
+		//------------TEST: performStep(direction) function test
+
+//		if(!stopFlag){
+//			//Perform many steps
+//			int counter = 0;
+//			for(; counter < 20; counter++){
+//				performStep(false); //just in a single direction
+//				setDelay(100); //in ms
+//			}
+//			stopFlag = true;
+//		}
+
+
+	//-----------------ROTATE BY PUSH BUTTON PROGRAM----------------------
+		//Left and right push buttons are used to turn motor clockWise or coutnerClockwise respectively
 		if(pushFlag){
 			pushFlag = false;
 			//Change direction according to the button pushed
 			if(pushButton == 16){ //SW1 button
-				GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_2, 4); //Set DIR pin HIGH
-				setDelay(1);
+				int counter = 0;
+				for(; counter < 200; counter++){
+					performStep(false); //just in a single direction
+					setDelay(1); //in ms
+				}
 			}
 			else{ //SW2 button
-				GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_2, 0); //Set STEP pin LOW
-				setDelay(1);
+				int counter = 0;
+				for(; counter < 200; counter++){
+					performStep(true); //just in a single direction
+					setDelay(1); //in ms
+				}
 			}
 		}
 
-		//****Important! Take into consideration the DRV8825 Timing Diagram!****
 
-		GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_1, 2); //Set STEP pin HIGH
-//		setDelay(PULSE_DELAY); //ms delay
-		setDelayMicro(PULSE_DELAY_MICROSEC); //us delay
-
-		GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_1, 0); //Set STEP pin LOW
-//		setDelay(PULSE_DELAY); //ms delay
-		setDelayMicro(PULSE_DELAY_MICROSEC); //us delay
-
-	}
+	} //End while
 }
 
 void PUSH_ISR(){

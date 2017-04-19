@@ -1,0 +1,25 @@
+/*****************************************************************************
+ *	 		Stepper Motor Software for DRV8825 Stepper driver
+ *	File: stepperSWDriver.h - function prototype and constant definitions
+ *
+ *  TODO Insert description here
+ *
+ *  Developed by Reynaldo Belfort
+ *  R-Tiles Team:
+ *  Emmanuel Ramos
+ *  Reynaldo Belfort
+ *  Carlos Rodriguez
+ *  Osvaldo Ramirez
+ *
+ * ----------------------Notes----------------------
+ *
+*****************************************************************************/
+
+#ifndef _STEPPER_SW_DRIVER_H
+#define _STEPPER_SW_DRIVER_H
+
+//************************Function prototypes************************
+
+extern void performStep(bool direction);
+
+#endif

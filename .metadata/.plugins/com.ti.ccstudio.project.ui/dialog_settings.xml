@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
+	<section name="CCE.ImportMacrosWizard">
+		<item value="\\fs.ece.uprm.edu\students\s402120683\My Documents\Micro 2 files\micro2-repository-workspace\r-tiles-dev\vars.ini" key="MacrosFileSelectionPage.BROWSE_FILTER"/>
+	</section>
 	<section name="com.ti.ccstudio.project.ui.internal.properties.DynamicPropertiesPageManager">
 	</section>
 	<section name="com.ti.ccstudio.project.ui.internal.preferences.DynamicPreferencePageManager">
