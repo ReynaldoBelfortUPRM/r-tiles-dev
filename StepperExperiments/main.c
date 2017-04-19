@@ -9,7 +9,7 @@
  */
 
 
-/* MCU Pins
+/* MCU Pin conecction information:
  * Port E:
  * 	1 - STEP pin
  * 	2 - DIR pin

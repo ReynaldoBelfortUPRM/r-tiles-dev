@@ -8,6 +8,18 @@
  * Reynaldo Belfort
  */
 
+/* MCU Pin conecction information:
+ * Port E: (some times not used)
+ * 	1 - STEP pin
+ * 	2 - DIR pin
+ * Port F:
+ * 	0 - SW2 Launchpad Pushbutton
+ * 	4 - SW1 Launchpad Pushbutton
+ * Port D:
+ * 	0 - STEP pin
+ *
+ * */
+
 #include <stdint.h>
 #include <stdbool.h>
 #include "inc/tm4c123gh6pm.h"
@@ -37,7 +49,7 @@ void PUSH_ISR();
 //Global Variables
 uint8_t pushButton = 0;
 bool pushFlag = false;
-volatile int currentSpeed = 80; //Initialized to start speed (units: steps/sec or Hz) (20 herz is the minimum)
+volatile int currentSpeed = 250; //Initialized to start speed (units: steps/sec or Hz) (20 herz is the minimum)
 volatile uint32_t pwmLoadValue = 0;
 volatile uint32_t pwmClockFreq = 0;
 
@@ -45,13 +57,13 @@ int main (void){
     //----MCU Initialization----
     SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_XTAL_16MHZ|SYSCTL_OSC_MAIN); //Set-up the clocking of the MCU to 40MHz
     //Enable port E peripheral
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
+   // SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
 
     //setDelay(2); //1ms delay
    // while( !(SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOE)) ); //In order to avoid potential FaultISR
 
-    GPIOPinTypeGPIOOutput(GPIO_PORTE_BASE, GPIO_PIN_1 | GPIO_PIN_2); //Driver's STEP pin
+    //GPIOPinTypeGPIOOutput(GPIO_PORTE_BASE, GPIO_PIN_1 | GPIO_PIN_2); //Driver's STEP pin
     //--------------------------
 
     //---------Set up Port F push button---------
@@ -79,7 +91,7 @@ int main (void){
 	GPIOPinTypePWM(GPIO_PORTD_BASE, GPIO_PIN_0); //Set Port D pin 0 as output //TODO Checkout which ports can be used for PWM functionallity
 	GPIOPinConfigure(GPIO_PD0_M1PWM0); //Select PWM Generator 0 from PWM Module 1
 
-	pwmClockFreq = SysCtlClockGet() / 32; //TODO as Isnt the same as ROM_SysCtlPWMClockSet(SYSCTL_PWMDIV_64);? Is something being repeated?
+	pwmClockFreq = SysCtlClockGet() / 32;
 	//Setting initial stepper speed
 	pwmLoadValue = (pwmClockFreq / currentSpeed) - 1; //Load Value = (PWMGeneratorClock * DesiredPWMPeriod) - 1
 
@@ -101,24 +113,41 @@ int main (void){
 			if(pushButton == 16){ //SW1 button
 				//GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_2, 4); //Set DIR pin HIGH
 
-				//Decrease speed
-				if(currentSpeed - 150 > STEPPER_SPEED_LIMIT_MIN) {
-					currentSpeed = currentSpeed - 150;
-					pwmLoadValue = (pwmClockFreq / currentSpeed) - 1;
-					PWMGenPeriodSet(PWM1_BASE, PWM_GEN_0, pwmLoadValue); //Set PWM period determined by the load value
-				}
+				//------Alternate program------
+				//Turn OFF PWM generator
+				PWMGenDisable(PWM1_BASE, PWM_GEN_0);
+
+//				//Decrease speed
+//				if(currentSpeed - 150 > STEPPER_SPEED_LIMIT_MIN) {
+//					currentSpeed = currentSpeed - 150;
+//					//Change PWM Frequency by disabling the generator first
+//					//Disable PWM Generator
+//					PWMGenEnable(PWM1_BASE, PWM_GEN_0);
+//					pwmLoadValue = (pwmClockFreq / currentSpeed) - 1;
+//					PWMGenPeriodSet(PWM1_BASE, PWM_GEN_0, pwmLoadValue); //Set PWM period determined by the load value
+//					//Enable PWM Generator
+//					PWMGenEnable(PWM1_BASE, PWM_GEN_0);
+//				}
 
 				setDelay(1);
 			}
 			else{ //SW2 button
 				//GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_2, 0); //Set DIR pin LOW
 
-				//Increase speed
-				if(currentSpeed + 150 < STEPPER_SPEED_LIMIT_MAX) {
-					currentSpeed = currentSpeed + 150;
-					pwmLoadValue = (pwmClockFreq / currentSpeed) - 1;
-					PWMGenPeriodSet(PWM1_BASE, PWM_GEN_0, pwmLoadValue); //Set PWM period determined by the load value
-				}
+				//------Alternate program------
+				//Turn ON PWM generator
+				PWMGenEnable(PWM1_BASE, PWM_GEN_0);
+
+//				//Increase speed
+//				if(currentSpeed + 150 < STEPPER_SPEED_LIMIT_MAX) {
+//					currentSpeed = currentSpeed + 150;
+//					//Disable PWM Generator
+//					PWMGenEnable(PWM1_BASE, PWM_GEN_0);
+//					pwmLoadValue = (pwmClockFreq / currentSpeed) - 1;
+//					PWMGenPeriodSet(PWM1_BASE, PWM_GEN_0, pwmLoadValue); //Set PWM period determined by the load value
+//					//Enable PWM Generator
+//					PWMGenEnable(PWM1_BASE, PWM_GEN_0);
+//				}
 
 				setDelay(1);
 			}
