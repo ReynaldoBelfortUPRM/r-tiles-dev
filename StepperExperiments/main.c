@@ -41,9 +41,10 @@
 
 //Function declarations
 void PUSH_ISR();
+void LIMIT_SWITCH_ISR();
 
 //Global Variables
-uint8_t pushButton = 0;
+short pushButton = 0;
 bool pushFlag = false;
 bool stopFlag = false;
 
@@ -53,6 +54,7 @@ int main (void){
     //Enable port E peripheral
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
 
     //setDelay(2); //1ms delay
    // while( !(SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOE)) ); //In order to avoid potential FaultISR
@@ -72,7 +74,17 @@ int main (void){
     GPIOIntRegister(GPIO_PORTF_BASE, PUSH_ISR);
     GPIOIntTypeSet(GPIO_PORTF_BASE, GPIO_PIN_4|GPIO_PIN_0, GPIO_FALLING_EDGE);  // Set PB2/3 to falling edge
     GPIOIntEnable(GPIO_PORTF_BASE, GPIO_PIN_4|GPIO_PIN_0);
+
+    //Register Limit Switch Pin
+    GPIOPadConfigSet(GPIO_PORTA_BASE, GPIO_PIN_5, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+    GPIOIntRegister(GPIO_PORTA_BASE, LIMIT_SWITCH_ISR);
+    GPIOIntTypeSet(GPIO_PORTA_BASE, GPIO_PIN_5, GPIO_FALLING_EDGE);
+    GPIOIntEnable(GPIO_PORTA_BASE, GPIO_PIN_5);
     //--------------------------------
+
+    //Temporary variables
+    bool runMotor = false;
+    bool runDirection = false; //FALSE = downward , TRUE = upward
 
 	while(1){
 
@@ -118,27 +130,70 @@ int main (void){
 //			stopFlag = true;
 //		}
 
+		//-----------------LIMIT SWITCH CODE----------------------
+		//Limit switch code - Just change direction
+//		if(pushButton == 32){ //Limit switch
+//			pushButton = -1;
+//			toggleVar = !toggleVar;
+//			if(toggleVar)
+//				//PWMGenEnable(PWM1_BASE, PWM_GEN_0);
+//			else
+//				//PWMGenDisable(PWM1_BASE, PWM_GEN_0);
+//		}
+		//--------------------------------------------------------------------
 
 	//-----------------ROTATE BY PUSH BUTTON PROGRAM----------------------
 		//Left and right push buttons are used to turn motor clockWise or coutnerClockwise respectively
+//		if(pushFlag){
+//			pushFlag = false;
+//			//Change direction according to the button pushed
+//			if(pushButton == 16){ //SW1 button
+//				int counter = 0;
+//				for(; counter < 300; counter++){
+//					performStep(false); //just in a single direction
+//					setDelay(1); //in ms
+//				}
+//			}
+//			else{ //SW2 button
+//				int counter = 0;
+//				for(; counter < 300; counter++){
+//					performStep(true); //just in a single direction
+//					setDelay(1); //in ms
+//				}
+//			}
+//		}
+
+	//-----------------RUN STEPPERS WITH LIMIT SWITCH-----------------
+		//Left and right push buttons are used to ______________________________
+		runMotor = false;
 		if(pushFlag){
 			pushFlag = false;
 			//Change direction according to the button pushed
 			if(pushButton == 16){ //SW1 button
-				int counter = 0;
-				for(; counter < 200; counter++){
-					performStep(false); //just in a single direction
-					setDelay(1); //in ms
-				}
+				pushButton = -1;
+				runMotor = true;
+				runDirection = false;
 			}
-			else{ //SW2 button
-				int counter = 0;
-				for(; counter < 200; counter++){
-					performStep(true); //just in a single direction
-					setDelay(1); //in ms
-				}
+			else if(pushButton == 1){ //SW2 button
+				pushButton = -1;
+				runMotor = true;
+				runDirection = true;
 			}
 		}
+
+
+		while(runMotor){
+			//Limit switch code
+			if(pushFlag && pushButton == 32){ //Limit switch
+				pushButton = -1;
+				pushFlag = false;
+				runMotor = false;
+			}
+
+			performStep(runDirection);
+		}
+
+	//----------------------------------------------------------------
 
 
 	} //End while
@@ -150,3 +205,11 @@ void PUSH_ISR(){
 	pushButton = GPIOIntStatus(GPIO_PORTF_BASE,true); //To read which button interrupted
 	GPIOIntClear(GPIO_PORTF_BASE, GPIO_PIN_4|GPIO_PIN_0);
 }
+
+void LIMIT_SWITCH_ISR(){
+	setDelay(30); //For debouncing
+	pushFlag = true;
+	pushButton = GPIOIntStatus(GPIO_PORTA_BASE, true); //To read which button interrupted
+	GPIOIntClear(GPIO_PORTA_BASE, GPIO_PIN_5);
+}
+

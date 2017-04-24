@@ -45,10 +45,12 @@
 
 //Function declarations
 void PUSH_ISR();
+void LIMIT_SWITCH_ISR();
 
 //Global Variables
-uint8_t pushButton = 0;
+short pushButton = 0;
 bool pushFlag = false;
+bool toggleVar = false;
 volatile int currentSpeed = 250; //Initialized to start speed (units: steps/sec or Hz) (20 herz is the minimum)
 volatile uint32_t pwmLoadValue = 0;
 volatile uint32_t pwmClockFreq = 0;
@@ -57,8 +59,9 @@ int main (void){
     //----MCU Initialization----
     SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_XTAL_16MHZ|SYSCTL_OSC_MAIN); //Set-up the clocking of the MCU to 40MHz
     //Enable port E peripheral
-   // SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
 
     //setDelay(2); //1ms delay
    // while( !(SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOE)) ); //In order to avoid potential FaultISR
@@ -78,6 +81,12 @@ int main (void){
     GPIOIntRegister(GPIO_PORTF_BASE, PUSH_ISR);
     GPIOIntTypeSet(GPIO_PORTF_BASE, GPIO_PIN_4|GPIO_PIN_0, GPIO_FALLING_EDGE);  // Set PB2/3 to falling edge
     GPIOIntEnable(GPIO_PORTF_BASE, GPIO_PIN_4|GPIO_PIN_0);
+
+    //Register Limit Switch Pin
+    GPIOPadConfigSet(GPIO_PORTA_BASE, GPIO_PIN_5, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+    GPIOIntRegister(GPIO_PORTA_BASE, LIMIT_SWITCH_ISR);
+    GPIOIntTypeSet(GPIO_PORTA_BASE, GPIO_PIN_5, GPIO_FALLING_EDGE);
+    GPIOIntEnable(GPIO_PORTA_BASE, GPIO_PIN_5);
     //--------------------------------
 
     //---------------PWM setup-------------
@@ -109,13 +118,24 @@ int main (void){
 
 		if(pushFlag){
 			pushFlag = false;
+			//Limit switch code - Just change direction
+			if(pushButton == 32){ //Limit switch
+				pushButton = -1;
+				toggleVar = !toggleVar;
+				if(toggleVar)
+					PWMGenEnable(PWM1_BASE, PWM_GEN_0);
+				else
+					PWMGenDisable(PWM1_BASE, PWM_GEN_0);
+			}
+
 			//Change direction according to the button pushed
 			if(pushButton == 16){ //SW1 button
+
 				//GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_2, 4); //Set DIR pin HIGH
 
 				//------Alternate program------
 				//Turn OFF PWM generator
-				PWMGenDisable(PWM1_BASE, PWM_GEN_0);
+				//PWMGenDisable(PWM1_BASE, PWM_GEN_0);
 
 //				//Decrease speed
 //				if(currentSpeed - 150 > STEPPER_SPEED_LIMIT_MIN) {
@@ -136,7 +156,7 @@ int main (void){
 
 				//------Alternate program------
 				//Turn ON PWM generator
-				PWMGenEnable(PWM1_BASE, PWM_GEN_0);
+//				PWMGenEnable(PWM1_BASE, PWM_GEN_0);
 
 //				//Increase speed
 //				if(currentSpeed + 150 < STEPPER_SPEED_LIMIT_MAX) {
@@ -161,6 +181,13 @@ int main (void){
 void PUSH_ISR(){
 	setDelay(30); //For debouncing
 	pushFlag = true;
-	pushButton = GPIOIntStatus(GPIO_PORTF_BASE,true); //To read which button interrupted
+	pushButton = GPIOIntStatus(GPIO_PORTF_BASE, true); //To read which button interrupted
 	GPIOIntClear(GPIO_PORTF_BASE, GPIO_PIN_4|GPIO_PIN_0);
+}
+
+void LIMIT_SWITCH_ISR(){
+	setDelay(30); //For debouncing
+	pushFlag = true;
+	pushButton = GPIOIntStatus(GPIO_PORTA_BASE, true); //To read which button interrupted
+	GPIOIntClear(GPIO_PORTA_BASE, GPIO_PIN_5);
 }
