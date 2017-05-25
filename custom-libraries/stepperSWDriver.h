@@ -38,9 +38,11 @@
 //----------------------Function prototypes-------------------------
 
 extern void performStep(bool direction);
+extern void performStepSpecific(bool clockwise, int driverPort, int gpioPin_STEP, int gpioPin_DIR);
 extern void performAmountSteps(uint32_t amountSteps, bool direction);
-extern void spinStepperMeters(double distance, bool clockwise);
-extern void spinStepperInches(double distance, bool clockwise);
+extern void spinStepperMeters(double distance, bool clockwise, uint16_t delay);
+extern void spinStepperInches(double distance, bool clockwise, uint16_t delay);
+extern void spinStepperAngle(float angle, bool clockwise, uint16_t delay);
 
 
 //------------------------------------------------------------------

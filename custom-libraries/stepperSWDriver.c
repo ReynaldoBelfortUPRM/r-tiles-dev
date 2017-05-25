@@ -74,6 +74,28 @@ void performStep(bool clockwise){ //TODO Verify if in effect, true represents cl
 
 }
 
+//Send a pulse to the STEP pin
+void performStepSpecific(bool clockwise, int driverPort, int gpioPin_STEP, int gpioPin_DIR){ //TODO Verify if in effect, true represents clockwise for the parameter
+
+	//TODO Having thess if-clauses may cause problems. We constantly keep setting the DIR pin
+	if(clockwise == true){ //Clockwise direction
+		GPIOPinWrite(driverPort, gpioPin_DIR, 4); //Set DIR pin HIGH
+		setDelayMicro(500);
+	}
+	else{
+		GPIOPinWrite(driverPort, gpioPin_DIR, 0);  //Set DIR pin HIGH
+		setDelayMicro(500);
+	}
+
+	//****Important! Take into consideration the DRV8825 Timing Diagram!****
+
+	GPIOPinWrite(driverPort, gpioPin_STEP, 2); //Set STEP pin HIGH
+	setDelayMicro(PULSE_DELAY_MICROSEC); //us delay to comply with DRV8825 timing diagram
+	GPIOPinWrite(driverPort, gpioPin_STEP, 0); //Set STEP pin LOW
+	setDelayMicro(PULSE_DELAY_MICROSEC);//us delay to comply with DRV8825 timing diagram
+
+}
+
 void performAmountSteps(uint32_t amountSteps, bool clockwise){
 	int counter = 0;
 	for(; counter < amountSteps; counter++){
@@ -82,31 +104,33 @@ void performAmountSteps(uint32_t amountSteps, bool clockwise){
 }
 
 //distance in meters
-void spinStepperMeters(double distance, bool clockwise){
+void spinStepperMeters(double distance, bool clockwise, uint16_t delay){
 
 	uint32_t amountSteps = 0;
 	amountSteps = (MOTOR_WHEEL_CIRCUM_METERS / distance) * MOTOR_STEPS_PER_REV;
 	uint32_t counter = 0;
 	for(; counter < amountSteps; counter++){
 		performStep(clockwise); //just in a single direction
+		setDelay(delay);
 	}
 
 }
 
 //distance in inches
-void spinStepperInches(double distance, bool clockwise){
+void spinStepperInches(double distance, bool clockwise, uint16_t delay){
 
 	uint32_t amountSteps = 0;
 	amountSteps = (MOTOR_WHEEL_CIRCUM_INCHES / distance) * MOTOR_STEPS_PER_REV;
 	uint32_t counter = 0;
 	for(; counter < amountSteps; counter++){
 		performStep(clockwise); //just in a single direction
+		setDelay(delay);
 	}
 
 }
 
 //angle in degrees
-void spinStepperAngle(float angle, bool clockwise){
+void spinStepperAngle(float angle, bool clockwise, uint16_t delay){
 
 	uint32_t amountSteps = 0;
 	uint32_t stepCounter = 0;
@@ -116,6 +140,7 @@ void spinStepperAngle(float angle, bool clockwise){
 	//We perform a correction multiplying by 4 because we take into consideration that 32steps equals to a 90 degree rotation
 	for(;stepCounter < amountSteps ; stepCounter++){
 		performStep(clockwise);
+		setDelay(delay);
 	}
 
 }

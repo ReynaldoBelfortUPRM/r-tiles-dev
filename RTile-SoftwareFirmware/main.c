@@ -8,11 +8,21 @@
  * Reynaldo Belfort
  */
 
-
 /* MCU Pin conecction information:
  * Port E:
+ * Movment System
  * 	1 - STEP pin
  * 	2 - DIR pin
+ * Dispenser
+ * 	3 - STEP
+ * 	4 - DIR pin
+ * Stack Holder
+ *
+ * Port A:
+ * 	Limit switches:
+ * 	2-  Dispenser BOTTOM
+ * 	3-  Dispenser TOP
+ *
  * Port F:
  * 	0 - SW2 Launchpad Pushbutton
  * 	4 - SW1 Launchpad Pushbutton
@@ -36,10 +46,13 @@
 #include "tivaUtils.h"
 #include "stepperSWDriver.h"
 
-//Constants
+//Constant definitions
 #define PULSE_DELAY 1
 #define PULSE_DELAY_MICROSEC 500 //microseconds 4%-4.8% error This number is not necesarily accurate.
 #define PWM_FREQUENCY 50
+
+#define DISPENSER_PIN_PARAMS GPIO_PORTE_BASE, GPIO_PIN_1, GPIO_PIN_2
+#define MOV_SYSTEM_PIN_PARAMS GPIO_PORTE_BASE, GPIO_PIN_4, GPIO_PIN_5
 
 //Function declarations
 void PUSH_ISR();
@@ -55,6 +68,9 @@ short pushButton = 0;
 bool pushFlag = false;
 bool stopFlag = false;
 
+bool DISPENSER_ACTIVE = false;
+bool DISPENSER_STATE = 0;
+
 //For dispenser arms
 volatile uint32_t ui32Load;
 volatile uint32_t ui32PWMClock;
@@ -62,15 +78,16 @@ volatile uint8_t ui8Adjust;
 volatile uint8_t ui8AdjustLeft;
 
 int main (void){
+
     //----MCU Initialization----
     SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_XTAL_16MHZ|SYSCTL_OSC_MAIN); //Set-up the clocking of the MCU to 40MHz
-    //Enable port E peripheral
+    //Enable port peripherals
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOF);
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
 
     //setDelay(2); //1ms delay
-   // while( !(SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOE)) ); //In order to avoid potential FaultISR
+    //while( !(SysCtlPeripheralReady(SYSCTL_PERIPH_GPIOE)) ); //In order to avoid potential FaultISR
 
     GPIOPinTypeGPIOOutput(GPIO_PORTE_BASE, GPIO_PIN_1 | GPIO_PIN_2); //Driver's STEP pin
     //--------------------------
@@ -83,16 +100,24 @@ int main (void){
     GPIOPadConfigSet(GPIO_PORTF_BASE, GPIO_PIN_4|GPIO_PIN_0, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
     //-------------------------------------------
 
-    //--------Interrupt setup---------
+    //--------Interrupt configuration---------
     GPIOIntRegister(GPIO_PORTF_BASE, PUSH_ISR);
     GPIOIntTypeSet(GPIO_PORTF_BASE, GPIO_PIN_4|GPIO_PIN_0, GPIO_FALLING_EDGE);  // Set PB2/3 to falling edge
     GPIOIntEnable(GPIO_PORTF_BASE, GPIO_PIN_4|GPIO_PIN_0);
 
+    //----Dispenser - BOTTOM----
     //Register Limit Switch Pin
-    GPIOPadConfigSet(GPIO_PORTA_BASE, GPIO_PIN_5, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
-    GPIOIntRegister(GPIO_PORTA_BASE, LIMIT_SWITCH_ISR);
-    GPIOIntTypeSet(GPIO_PORTA_BASE, GPIO_PIN_5, GPIO_FALLING_EDGE);
-    GPIOIntEnable(GPIO_PORTA_BASE, GPIO_PIN_5);
+    GPIOPadConfigSet(GPIO_PORTA_BASE, GPIO_PIN_2, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+    GPIOIntRegister(GPIO_PORTA_BASE, LIMIT_SWITCH_DISPENSER_BOTTOM_ISR);
+    GPIOIntTypeSet(GPIO_PORTA_BASE, GPIO_PIN_2, GPIO_FALLING_EDGE);
+    GPIOIntEnable(GPIO_PORTA_BASE, GPIO_PIN_2);
+
+    //----Dispenser - TOP----
+    //Register Limit Switch Pin
+    GPIOPadConfigSet(GPIO_PORTA_BASE, GPIO_PIN_3, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+    GPIOIntRegister(GPIO_PORTA_BASE, LIMIT_SWITCH_DISPENSER_TOP_ISR);
+    GPIOIntTypeSet(GPIO_PORTA_BASE, GPIO_PIN_3, GPIO_FALLING_EDGE);
+    GPIOIntEnable(GPIO_PORTA_BASE, GPIO_PIN_3);
     //--------------------------------
 
 
@@ -124,6 +149,7 @@ int main (void){
     bool runMotor = false;
     bool runDirection = false; //FALSE = downward , TRUE = upward
 
+
 	while(1){
 
 		//-----------------DISTANCE SPINNING PROGRAM----------------------
@@ -133,112 +159,72 @@ int main (void){
 //			setDelay(10); //ms
 //		}
 
-//		if(pushFlag){
-//			pushFlag = false;
-//			//Change direction according to the button pushed
-//			if(pushButton == 16){ //SW1 button
-//				GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_2, 4); //Set DIR pin HIGH
-//				setDelay(1);
-//			}
-//			else{ //SW2 button
-//				GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_2, 0); //Set STEP pin LOW
-//				setDelay(1);
-//			}
-//		}
+		//-----------CYCLE STEP 1 -Move robot to next tile position-------------
 
-		//****Important! Take into consideration the DRV8825 Timing Diagram!****
-
-//		GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_1, 2); //Set STEP pin HIGH
-////		setDelay(PULSE_DELAY); //ms delay
-//		setDelayMicro(PULSE_DELAY_MICROSEC); //us delay
+		//----------CYCLE STEP 2 -Move tile from StackHolder to Dispenser-------
+//		STACK_STATE = 0; //TODO Maybe we don't need this
+//		STACKHOLDER_ACTIVE = true;
 //
-//		GPIOPinWrite(GPIO_PORTE_BASE, GPIO_PIN_1, 0); //Set STEP pin LOW
-////		setDelay(PULSE_DELAY); //ms delay
-//		setDelayMicro(PULSE_DELAY_MICROSEC); //us delay
-
-		//------------TEST: performStep(direction) function test
-
-//		if(!stopFlag){
-//			//Perform many steps
-//			int counter = 0;
-//			for(; counter < 20; counter++){
-//				performStep(false); //just in a single direction
-//				setDelay(100); //in ms
-//			}
-//			stopFlag = true;
-//		}
-
-		//-----------------LIMIT SWITCH CODE----------------------
-		//Limit switch code - Just change direction
-//		if(pushButton == 32){ //Limit switch
-//			pushButton = -1;
-//			toggleVar = !toggleVar;
-//			if(toggleVar)
-//				//PWMGenEnable(PWM1_BASE, PWM_GEN_0);
-//			else
-//				//PWMGenDisable(PWM1_BASE, PWM_GEN_0);
-//		}
-		//--------------------------------------------------------------------
-
-	//-----------------ROTATE BY PUSH BUTTON PROGRAM----------------------
-		//Left and right push buttons are used to turn motor clockWise or coutnerClockwise respectively
-//		if(pushFlag){
-//			pushFlag = false;
-//			//Change direction according to the button pushed
-//			if(pushButton == 16){ //SW1 button
-//				int counter = 0;
-//				for(; counter < 300; counter++){
-//					performStep(false); //just in a single direction
-//					setDelay(1); //in ms
-//				}
-//			}
-//			else{ //SW2 button
-//				int counter = 0;
-//				for(; counter < 300; counter++){
-//					performStep(true); //just in a single direction
-//					setDelay(1); //in ms
-//				}
+//		while(STACKHOLDER_ACTIVE){
+//			switch(STACK_STATE){
+//				case 0:
+//					//Mantain moving Stack Holder upward
+//					performStep(true); //TODO We have to set what is thw pin to be used first
+//					setDelay(35);
+//					break;
+//				case 1:
+//					if(!feederON)
+//					{
+//						//Turn On Feeder
+//						setDelay(350);
+//						//TODO Assign GPIO values
+//					}
+//					break;
+//				case 2:
+//					//Stop Stack Holder operation
+//
+//					//Turn OFF feeder
+//					if(feederON)
+//					{
+//						setDelay(200);
+//						//TODO Assign GPIO values
+//					}
+//					STACKHOLDER_ACTIVE = false;
+//					break;
 //			}
 //		}
 
-	//-----------------RUN STEPPERS WITH LIMIT SWITCH-----------------
-		//Left and right push buttons are used to ______________________________
-		runMotor = false;
 		if(pushFlag){
 			pushFlag = false;
-			//Change direction according to the button pushed
-			if(pushButton == 16){ //SW1 button
-				pushButton = -1;
-				runMotor = true;
-				runDirection = false;
-			}
-			else if(pushButton == 1){ //SW2 button
-				pushButton = -1;
-				runMotor = true;
-				runDirection = true;
-			}
+			//-------------CYCLE STEP 3 - Deposit tile to the floor-----------------
+					DISPENSER_STATE = 0; //TODO Maybe we don't need this
+					DISPENSER_ACTIVE = true;
+
+					while(DISPENSER_ACTIVE){
+						switch(DISPENSER_STATE){
+							case 0:
+								//Mantain moving Dispenser downward n
+								//performStep(false, GPIO_PORTE_BASE, GPIO_PIN_1, GPIO_PIN_2);
+								performStepSpecific(false, DISPENSER_PIN_PARAMS);
+								break;
+							case 1:
+								//Opening & closing dispenser arms
+								openArms();
+								setDelay(1500); //1.5 secs
+								closeArms();
+								DISPENSER_STATE = 2; //State transition
+								break;
+							case 2:
+								//Mantain moving Dispenser upward
+								performStepSpecific(true, DISPENSER_PIN_PARAMS);
+								break;
+							case 3:
+								//Stop Dispenser operation
+								DISPENSER_ACTIVE = false;
+								break;
+						}
+					}
 		}
-
-
-		while(runMotor){
-			//Limit switch code
-			if(pushFlag && pushButton == 32){ //Limit switch
-				pushButton = -1;
-				pushFlag = false;
-				runMotor = false;
-
-				//Opening & closing dispenser arms
-				openArms();
-				setDelay(1500);
-				closeArms();
-			}
-
-			performStep(runDirection);
-			//setDelay(30);
-		}
-
-	//----------------------------------------------------------------
-
 
 	} //End while
 }
@@ -248,27 +234,32 @@ int main (void){
 void PUSH_ISR(){
 	setDelay(30); //For debouncing
 	pushFlag = true;
-	pushButton = GPIOIntStatus(GPIO_PORTF_BASE,true); //To read which button interrupted
+	pushButton = GPIOIntStatus(GPIO_PORTF_BASE, true); //To read which button interrupted
 	GPIOIntClear(GPIO_PORTF_BASE, GPIO_PIN_4|GPIO_PIN_0);
 }
 
-void LIMIT_SWITCH_ISR(){
+void LIMIT_SWITCH_DISPENSER_BOTTOM_ISR(){
 	setDelay(30); //For debouncing
-	pushFlag = true;
-	pushButton = GPIOIntStatus(GPIO_PORTA_BASE, true); //To read which button interrupted
-	GPIOIntClear(GPIO_PORTA_BASE, GPIO_PIN_5);
+//	pushFlag = true;
+//	pushButton = GPIOIntStatus(GPIO_PORTA_BASE, true); //To read which button interrupted
+	GPIOIntClear(GPIO_PORTA_BASE, GPIO_PIN_2);
+
+	DISPENSER_STATE = 1; //State transition - Perform open & close dispenser arms
 }
 
 void LIMIT_SWITCH_DISPENSER_TOP_ISR(){
-
+	setDelay(30); //For debouncing
+	GPIOIntClear(GPIO_PORTA_BASE, GPIO_PIN_3);
+	DISPENSER_STATE = 3; //State transition - Stop dispenser operation
 }
 
 void LIMIT_SWITCH_STACKH_BOTTOM_ISR(){
-
 }
 
 void LIMIT_SWITCH_STACKH_TOP_ISR(){
-
+//	setDelay(30); //For debouncing
+//	GPIOIntClear(GPIO_PORTA_BASE, GPIO_PIN_7);
+//	STACK_STATE = 2; //State transition - Stop stack holder operation
 }
 
 //Extra functions
