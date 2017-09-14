@@ -25,7 +25,7 @@ short switchButton = 0;
 //short currentState = 0;
 short safety = 1;
 short currentState = 0;
-int stepsPerTile[3] = {0,0,235};
+int stepsPerTile[3] = {0,220,210};
 int currentTiles = 3;
 //---------------------------------------------
 
@@ -36,7 +36,7 @@ int currentTiles = 3;
 #define STEP_STACK_ELE GPIO_PIN_3
 #define DIRECTION_STACK_ELE GPIO_PIN_4
 #define CLOCK_FREQ 40
-#define STEPSTACK 1000
+#define STEPSTACK 1240		//************************************************************************************************************
 
 /* Feeder Stepper Motor Constants */
 #define DRIVER_FEEDER GPIO_PORTC_BASE		/* Feeder base port */
@@ -62,7 +62,7 @@ uint32_t computeDelayCount(uint32_t waitTime, uint8_t clockFreq);
 uint32_t computeDelayCountMicrosec(float waitTime, uint8_t clockFreq);
 
 void main(void)
-{
+  {
 	//----MCU Initialization----
 	SysCtlClockSet(SYSCTL_SYSDIV_5|SYSCTL_USE_PLL|SYSCTL_XTAL_16MHZ|SYSCTL_OSC_MAIN); //Set-up the clocking of the MCU to 40MHz
 
@@ -76,6 +76,7 @@ void main(void)
 	//------Stack Stepper Motor Pin Configuration-------
 	GPIOPinTypeGPIOOutput(GPIO_PORTE_BASE, GPIO_PIN_3 | GPIO_PIN_4); //Driver's STEP pin
 	//-------------------------------------------
+
 	//------ Feeder Stepper Motor Pin Configuration ----
 	GPIOPinTypeGPIOOutput(DRIVER_FEEDER, STEP_FEEDER | DIRECTION_FEEDER); //Feeder Driver's STEP pin
 	//--------------------------------------------------
@@ -118,38 +119,51 @@ void main(void)
 		if(currentState == 1){
 			//GPIOIntEnable(GPIO_PORTA_BASE, GPIO_PIN_2|GPIO_PIN_3);
 			GPIOIntEnable(GPIO_PORTA_BASE, GPIO_PIN_2);
-			while(currentState ==1){
-				//if(stackUp1 == false){
-				runMotor = true;
-				while(runMotor == true){
-					performStepStack(runDirectionStack); 		//just in a single direction
-					setDelay(1); //in ms
-				}
-				//GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, 0x80);
-				GPIOIntDisable(GPIO_PORTA_BASE, GPIO_PIN_2);
+			//while(currentState ==1){
+			//if(stackUp1 == false){
+			runMotor = true;
+			while(runMotor == true){
+				performStepStack(runDirectionStack); 		//just in a single direction
+				setDelay(1); //in ms
+			}
+			//GPIOPinWrite(GPIO_PORTA_BASE, GPIO_PIN_7, 0x80);
+			GPIOIntDisable(GPIO_PORTA_BASE, GPIO_PIN_2);
 
-				int counter = 0;
-				runMotor = true;
-				for(; counter < STEPSTACK; counter++){
-					if(runMotor){
-						performStepStack(runDirectionStack); //just in a single direction
-						setDelay(1); //in ms
-					}else{
-						counter = STEPSTACK;
-					}
+			int counter = 0;
+			runMotor = true;
+			for(; counter < STEPSTACK; counter++){
+				if(runMotor){
+					performStepStack(runDirectionStack); //just in a single direction
+					setDelay(1); //in ms
+				}else{
+					counter = STEPSTACK;
 				}
-				int counter1 = 0;
+			}
+			runDirectionStack = true;
+
+			/*
+			 * int counter1 = 0;
 				runMotor = true;
-				for(; counter1 < 235; counter1++){
+				for(; counter1 < 210; counter1++){
 					performStepStack(runDirectionStack); //just in a single direction
 					setDelay(1); //in ms
 				}
-				currentState = 2;
-				//}
+			 */
+			while(true){
+				performStepFeeder(false); //just in a single direction
+				setDelay(1); //in ms
+				if(pushButton == 0){
+					while(1);
+				}
 			}
+
+			currentState = 2;
+
+			//}
+			//}
 		}
 
-		while(currentState == 2){
+		/*while(currentState == 2){
 			if(pushFlag){
 				SysCtlDelay(4000000); //For debouncing
 				pushFlag = false;
@@ -158,11 +172,14 @@ void main(void)
 					while(true){
 						performStepFeeder(false); //just in a single direction
 						setDelay(1); //in ms
+						if(pushButton == 0){
+							while(1);
+						}
 					}
 					//safety = 0;
 				}
 			}
-		}
+		}*/
 
 		//		while(currentState == 2){
 		//			if(safety !=0){
