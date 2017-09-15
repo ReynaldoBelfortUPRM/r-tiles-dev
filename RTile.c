@@ -23,6 +23,8 @@ short currentState = 0;			/* Current Program State */
 bool pushFlag = false;			/* Boolean variable to keep track if the ISR happened or not */
 short tileNumber = 0;			/* Number of tiles to be installed */
 short currentNumDisplayed=0;	/* Current number to be displayed on the LCD */
+int stepsPerTile[3] = {0,1000,951};
+int currentTiles = 0;
 
 /* Dispenser Arms Global Variables */
 volatile uint32_t load;			/* PWM load (Period) */
@@ -34,7 +36,7 @@ volatile uint8_t adjustLeft;	/* Adjust left servo motor PWM value */
 bool dispenserUp1 = true;			/* Variable for recording the state of the dispenser */
 //bool readyToDispense = false;		/* Ready to dispense variable */
 bool runMotorDispenser = true;		/* State of the stepper motor */
-bool runDirectionDispenser = true; 	/* FALSE = downward , TRUE = upward */
+bool runDirectionDispenser = true; 	/* FALSE = upward , TRUE = downward */
 
 /* Stack Elevator Global variables */
 bool runDirectionStack = true; 		/* FALSE = upward , TRUE = downward*/
@@ -59,6 +61,7 @@ bool runMotorStack = true;			/* Control if the Stack motor could continue to run
 #define DRIVER_DISP_ELE GPIO_PORTE_BASE			/* Dispenser elevator controller port */
 #define STEP_DISP_ELE GPIO_PIN_1				/* Step pin for the dispenser elevator */
 #define DIRECTION_DISP_ELE GPIO_PIN_2			/* Direction pin for the dispenser elevator */
+#define DISPENSER_FIX 800				/* Number of steps to fix step position */
 
 /* Contant Declarations for Postional System functions */
 #define DRIVER_POS GPIO_PORTD_BASE		/* Positional system driver Port */
@@ -72,7 +75,7 @@ bool runMotorStack = true;			/* Control if the Stack motor could continue to run
 #define BUTTONS_PORT GPIO_PORTC_BASE	/* User interface buttons port  */
 #define BUTTON_RIGHT GPIO_PIN_4			/* User interface right button */
 #define BUTTON_LEFT GPIO_PIN_5			/* User interface left button */
-#define MAXIMUM_NUM_TILES 3				/* Maximum number of tiles to dispense */
+#define MAXIMUM_NUM_TILES 2				/* Maximum number of tiles to dispense */
 
 /* General Constant Declarations */
 #define CLOCK_FREQ 40					/* Clock frecuency */
@@ -82,7 +85,9 @@ bool runMotorStack = true;			/* Control if the Stack motor could continue to run
 #define DRIVER_STACK_ELE GPIO_PORTE_BASE	/* Stack elevator driver port */
 #define STEP_STACK_ELE GPIO_PIN_3			/* Stack elevator step pin */
 #define DIRECTION_STACK_ELE GPIO_PIN_4
-#define STEPSTACK 1240 //TODO cambiar a array de valores dependiendo de la cantidad de losas puestas
+//#define STEPSTACK 1000 //********************************************************************************************************************************
+//#define STEPSTACK 947
+//TODO cambiar a array de valores dependiendo de la cantidad de losas puestas
 
 /* Feeder Stepper Motor Constants */
 #define DRIVER_FEEDER GPIO_PORTC_BASE		/* Feeder base port */
@@ -91,7 +96,7 @@ bool runMotorStack = true;			/* Control if the Stack motor could continue to run
 //--------------------------------------------------
 
 /* Interrupt Service Routines */
-void pushButtons_ISR();   /* User interface push buttons interrupt service routines */
+void pushButtons_ISR();
 void LIMIT_SWITCH();	//Switch interrupt Service Routine
 //void LIMIT_SWITCH_STACK();
 
@@ -124,7 +129,7 @@ uint32_t computeDelayCount(uint32_t waitTime, uint8_t clockFreq);
 uint32_t computeDelayCountMicrosec(float waitTime, uint8_t clockFreq);
 //-------------------------------------------------------------------
 void main(void)
- {
+{
 	/* Variable declaration */
 	uint8_t text[16][16] = {{"ICOM4217:"},{"R-Tile Proyect"},{"Press the right"},{"button to start"},{"Number of tiles"},{"to install: "},{"Error:"},{"Tile Number = 0"}};//Words to be written in LCD
 	int timesArray[16] = {9,14,15,15,15,12,6,15}; 				//text[] words lenght
@@ -214,72 +219,83 @@ void main(void)
 
 	//------------------------------------------------------------
 
-		/* User Interface State */
-		//--------------- State 0 -------------------------------
-		if(currentState == 0){
-			GPIOIntEnable(GPIO_PORTC_BASE, GPIO_PIN_4);
-			GPIOIntEnable(GPIO_PORTC_BASE, GPIO_PIN_5);
-			initializeLCD();				//Initialize LCD
-			writeWord(text[0],timesArray[0]);
-			enterCommand(0xC0,493.3);
-			writeWord(text[1],timesArray[1]);
-			//TODO delay 2 segundos
-			SysCtlDelay(40000000);
-			//TODO delay 2 segundos
+	/* User Interface State */
+	//--------------- State 0 -------------------------------
+	if(currentState == 0){
+		GPIOIntEnable(GPIO_PORTC_BASE, GPIO_PIN_4);
+		GPIOIntEnable(GPIO_PORTC_BASE, GPIO_PIN_5);
+		initializeLCD();				//Initialize LCD
+		writeWord(text[0],timesArray[0]);
+		enterCommand(0xC0,493.3);
+		writeWord(text[1],timesArray[1]);
+		//TODO delay 2 segundos
+		SysCtlDelay(40000000);
+		//TODO delay 2 segundos
 
-			enterCommand(0x01,20400);		//Clear display command
-			writeWord(text[4],timesArray[4]);
-			enterCommand(0xC0,493.3);
-			writeWord(text[5],timesArray[5]);
+		enterCommand(0x01,20400);		//Clear display command
+		writeWord(text[4],timesArray[4]);
+		enterCommand(0xC0,493.3);
+		writeWord(text[5],timesArray[5]);
 
-			currentNumDisplayed = dec2ASCII(tileNumber);
-			writeCharDisp(currentNumDisplayed);
+		currentNumDisplayed = dec2ASCII(tileNumber);
+		writeCharDisp(currentNumDisplayed);
 
-			while(currentState == 0){
-				if(pushFlag){
-					pushFlag = false;
-					if(pushButton == 0x10){
-						tileNumber++;
-						if(tileNumber > MAXIMUM_NUM_TILES){
-							tileNumber = 0;
-						}
-						currentNumDisplayed = dec2ASCII(tileNumber);
-						enterCommand(0xCC,493.3);
-						writeCharDisp(currentNumDisplayed);
+		while(currentState == 0){
+			if(pushFlag){
+				pushFlag = false;
+				if(pushButton == 0x10){
+					tileNumber++;
+					if(tileNumber > MAXIMUM_NUM_TILES){
+						tileNumber = 0;
 					}
+					currentNumDisplayed = dec2ASCII(tileNumber);
+					enterCommand(0xCC,493.3);
+					writeCharDisp(currentNumDisplayed);
+				}
 
-					if(pushButton ==0x20){
-						if(tileNumber == 0){
-							//Write error Message
-							enterCommand(0x01,20400);				//Clear display command
-							writeWord(text[6],timesArray[6]);
-							enterCommand(0xC0,493.3);
-							writeWord(text[7],timesArray[7]);
+				if(pushButton ==0x20){
+					if(tileNumber == 0){
+						//Write error Message
+						enterCommand(0x01,20400);				//Clear display command
+						writeWord(text[6],timesArray[6]);
+						enterCommand(0xC0,493.3);
+						writeWord(text[7],timesArray[7]);
 
-							SysCtlDelay(40000000);		//Delay
+						SysCtlDelay(40000000);		//Delay
 
-							enterCommand(0x01,20400);//Clear display command
-							writeWord(text[4],timesArray[4]);
-							enterCommand(0xC0,493.3);
-							writeWord(text[5],timesArray[5]);
+						enterCommand(0x01,20400);//Clear display command
+						writeWord(text[4],timesArray[4]);
+						enterCommand(0xC0,493.3);
+						writeWord(text[5],timesArray[5]);
 
-							currentNumDisplayed = dec2ASCII(tileNumber);
-							writeCharDisp(currentNumDisplayed);
+						currentNumDisplayed = dec2ASCII(tileNumber);
+						writeCharDisp(currentNumDisplayed);
 
-						}else{
-							currentState = 1;
-							GPIOIntDisable(GPIO_PORTC_BASE, GPIO_PIN_4);
-							GPIOIntDisable(GPIO_PORTC_BASE, GPIO_PIN_5);
-						}
+					}else{
+						currentTiles = tileNumber;
+						currentState = 1;
+						GPIOIntDisable(GPIO_PORTC_BASE, GPIO_PIN_4);
+						GPIOIntDisable(GPIO_PORTC_BASE, GPIO_PIN_5);
 					}
 				}
 			}
 		}
-		while(tileNumber !=0){
+	}
+	while(currentTiles !=0){
 		//--------------------------------------------------
 		/* Stack State */
 		//-------------------- State 1 ---------------------
 		if(currentState == 1){
+
+			/* FIX dispenser position */
+			int cd = 0;
+			while(cd != DISPENSER_FIX){
+				performStepDispenser(runDirectionDispenser); //just in a single direction
+				setDelay(PULSE_DELAY); //in ms
+				cd++;
+			}
+			//runDirectionDispenser = false;
+
 			//GPIOIntEnable(GPIO_PORTA_BASE, GPIO_PIN_2|GPIO_PIN_3);
 			GPIOIntEnable(GPIO_PORTA_BASE, GPIO_PIN_2);
 			//while(currentState ==1){
@@ -293,12 +309,12 @@ void main(void)
 
 			int counter = 0;
 			runMotorStack = true;
-			for(; counter < STEPSTACK; counter++){
+			for(; counter < stepsPerTile[currentTiles]; counter++){
 				if(runMotorStack){
 					performStepStack(runDirectionStack); //just in a single direction
 					setDelay(PULSE_DELAY); //in ms
 				}else{
-					counter = STEPSTACK;
+					counter = stepsPerTile[currentTiles];
 				}
 			}
 			runDirectionStack = true;
@@ -331,6 +347,13 @@ void main(void)
 			GPIOIntEnable(GPIO_PORTA_BASE, GPIO_PIN_5|GPIO_PIN_6);
 			while(currentState == 2){
 				//TODO si se activa el switch de arriba guardarlo en una variable y chequiar
+
+				/*runMotorDispenser = true;
+				while(runMotorDispenser){
+					performStepDispenser(runDirectionDispenser); //just in a single direction
+					setDelay(PULSE_DELAY); //in ms
+				}*/
+
 				if(dispenserUp1){
 					runMotorDispenser = true;
 					while(runMotorDispenser){
@@ -349,7 +372,8 @@ void main(void)
 					closeArms();
 
 					currentState = 3;
-					tileNumber--;
+					//currentState = 1;
+					currentTiles--;
 
 					GPIOIntDisable(GPIO_PORTA_BASE, GPIO_PIN_5|GPIO_PIN_6);
 					//readyToDispense = false;
@@ -357,14 +381,20 @@ void main(void)
 			}
 		}
 		//---------------------------------------------
-
 		/* Positional System State */
 		//----------- State 3 -------------------------
-		if(currentState == 3){
 
+		if(currentState == 3){
+			int cp = 0;
+			while(cp != 750){
+				performStepPositionalSystem(false); //just in a single direction
+				setDelay(PULSE_DELAY); //in ms
+				cp++;
+			}
 			//spinStepperInches(6,false,5); //just in a single direction
 			currentState = 1;
 		}
+
 		//---------------------------------------------
 	}
 	while(1);
