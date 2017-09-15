@@ -91,7 +91,7 @@ bool runMotorStack = true;			/* Control if the Stack motor could continue to run
 //--------------------------------------------------
 
 /* Interrupt Service Routines */
-void pushButtons_ISR();
+void pushButtons_ISR();   /* User interface push buttons interrupt service routines */
 void LIMIT_SWITCH();	//Switch interrupt Service Routine
 //void LIMIT_SWITCH_STACK();
 
